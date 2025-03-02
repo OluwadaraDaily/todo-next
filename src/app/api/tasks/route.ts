@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: Request) {
   try {
     const data = await req.json();
     console.log('BODY [ADD TASKS] =>', data);
