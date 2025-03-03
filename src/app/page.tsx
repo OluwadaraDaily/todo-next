@@ -1,5 +1,4 @@
 "use client"
-
 import { Task } from "@/types/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
@@ -10,19 +9,42 @@ import { Loader2, Plus } from "lucide-react"
 
 
 export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    fetch("/api/tasks")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('DATA =>', data);
-        setTasks(data);
-      })
-      .catch((error) => {
-        console.log('ERROR =>', error);
-      });
-  }, [])
+  const queryClient = useQueryClient();
+
+  const clearForm = () => {
+    const form = document.querySelector('form');
+    if (form) {
+      (form as HTMLFormElement).reset();
+    }
+  }
+
+  const { data: tasks, isLoading: getTasksInitialLoading, isFetching: getTasksFetching, error, isPending } = useQuery<Task[]>({
+    queryKey: ['tasks'],
+    queryFn: TaskService.fetchTasks
+  });
+
+   const { mutate, isPending: addTaskPending } = useMutation({
+    mutationFn: TaskService.addTask,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      clearForm();
+    },
+    onError: (error) => {
+      console.log('ERROR [ADD TASK] =>', error);
+    }
+   })
+  
+  const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.target as HTMLFormElement);
+    mutate({
+      title: form.get('title') as string,
+      description: form.get('description') as string,
+    });
+  }
+
   return (
     <main className="h-full">
       <section className="w-[90%] md:w-[80%] lg:max-w-[1000px] mx-auto h-full my-8">

@@ -4,3 +4,8 @@ export interface Task {
   description: string | null;
   completed: boolean;
 }
+
+export interface ITaskData {
+  title: string;
+  description: string;
+}
