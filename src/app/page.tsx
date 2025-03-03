@@ -1,9 +1,10 @@
 "use client"
-import { Task, ITaskData } from "@/types/task";
+import { Task } from "@/types/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-
 import { TaskService } from "@/services/tasks";
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
 
 
 export default function Home() {
@@ -22,7 +23,7 @@ export default function Home() {
     queryFn: TaskService.fetchTasks
   });
 
-   const mutation = useMutation({
+   const { mutate, isPending: addTaskPending } = useMutation({
     mutationFn: TaskService.addTask,
     onSuccess: () => {
       // Invalidate and refetch
@@ -37,9 +38,7 @@ export default function Home() {
   const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
     const form = new FormData(event.target as HTMLFormElement);
-    console.log("TITLE =>", form.get('title'));
-    console.log("DESCRIPTION =>", form.get('description'));
-    mutation.mutate({
+    mutate({
       title: form.get('title') as string,
       description: form.get('description') as string,
     });
@@ -62,6 +61,7 @@ export default function Home() {
               className="p-2 w-full border rounded-md mt-1"
               id="title"
               name="title"
+              readOnly={addTaskPending}
               required
             />
           </div>
@@ -71,9 +71,13 @@ export default function Home() {
               className="p-2 w-full border rounded-md mt-1"
               id="description"
               name="description"
+              readOnly={addTaskPending}
             ></textarea>
           </div>
-          <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-md border">Save</button>
+          <Button type="submit" disabled={addTaskPending}>
+            {addTaskPending && <Loader2 className="animate-spin" />}
+            Save
+          </Button>
         </form>
         <ul>
           {!!tasks && tasks.length > 0 && tasks.map((task) => (
