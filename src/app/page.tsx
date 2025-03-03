@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { TaskService } from "@/services/tasks";
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Loader2 } from "lucide-react"
 
 
@@ -18,7 +19,7 @@ export default function Home() {
     }
   }
 
-  const { data: tasks, isLoading, isFetching, error, isPending } = useQuery<Task[]>({
+  const { data: tasks, isLoading: getTasksInitialLoading, isFetching: getTasksFetching, error, isPending } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: TaskService.fetchTasks
   });
@@ -79,13 +80,28 @@ export default function Home() {
             Save
           </Button>
         </form>
-        <ul>
-          {!!tasks && tasks.length > 0 && tasks.map((task) => (
-            <li key={task.id} className="w-full px-2 py-4 rounded-md bg-gray-100 mb-4">
-              {task.title}
-            </li>
-          ))}
-        </ul>
+        <div>
+          <div className="flex items-center gap-4 mb-4">
+            <h4 className="text-2xl">All tasks</h4>
+            {getTasksFetching && <Loader2 className="animate-spin" />}
+          </div>
+          {getTasksInitialLoading ?
+            <div className="flex flex-col space-y-4">
+              <Skeleton className="h-10 w-full lg:w-[70%]" />
+              <Skeleton className="h-10 w-full lg:w-[70%]" />
+              <Skeleton className="h-10 w-full lg:w-[70%]" />
+              <Skeleton className="h-10 w-full lg:w-[70%]" />
+            </div>
+          : (
+            <ul>
+              {!!tasks && tasks.length > 0 && tasks.map((task) => (
+                <li key={task.id} className="w-full px-2 py-4 rounded-md bg-gray-100 mb-4">
+                  {task.title}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
     </main>
   );
