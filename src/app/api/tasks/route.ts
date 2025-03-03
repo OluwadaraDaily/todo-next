@@ -24,14 +24,20 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: Request) {
   try {
     const data = await req.json();
     console.log('BODY [ADD TASKS] =>', data);
     const task = await prisma.task.create({ data });
     console.log('TASK =>', task);
-    return NextResponse.json(task, {  status: 201 });
+    const serializedTask = {
+      ...task,
+      id: task.id.toString(), // Convert BigInt to string
+    };
+
+    return NextResponse.json(serializedTask, {  status: 201 });
   } catch (error) {
+    console.log('ERROR [ADD TASK] ROUTE =>', error);
     return NextResponse.json({
       error: "Something went wrong"
     }, {  status: 500 });
