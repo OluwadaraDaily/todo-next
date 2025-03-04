@@ -6,10 +6,10 @@ import { TaskService } from "@/services/tasks";
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Loader2, Plus } from "lucide-react"
+import AddTask from "@/components/AddTask";
 
 
 export default function Home() {
-
   const queryClient = useQueryClient();
 
   const clearForm = () => {
@@ -43,43 +43,19 @@ export default function Home() {
       title: form.get('title') as string,
       description: form.get('description') as string,
     });
+    console.log("Form submitted");
   }
 
   return (
     <main className="h-full">
-      <section className="w-[90%] md:w-[80%] lg:max-w-[1000px] mx-auto h-full my-8">
+      <section className="w-[90%] md:w-[80%] lg:max-w-[700px] mx-auto h-full my-8">
         <div className="flex justify-between items-center">
           <h1>My Task Manager</h1>
-          <Button type="submit" disabled={addTaskPending || getTasksFetching}>
-            <Plus /> Create new task
-          </Button>
+          <AddTask
+            onSubmit={handleSubmit}
+            addTaskPending={addTaskPending}
+          />
         </div>
-        <form onSubmit={handleSubmit} className="my-8 border p-8">
-          <div className="mb-4">
-            <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              className="p-2 w-full border rounded-md mt-1"
-              id="title"
-              name="title"
-              readOnly={addTaskPending}
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="description">Description</label>
-            <textarea
-              className="p-2 w-full border rounded-md mt-1"
-              id="description"
-              name="description"
-              readOnly={addTaskPending}
-            ></textarea>
-          </div>
-          <Button type="submit" disabled={addTaskPending}>
-            {addTaskPending && <Loader2 className="animate-spin" />}
-            Save
-          </Button>
-        </form>
         <div>
           <div className="flex items-center gap-4 mb-4">
             <h4 className="text-2xl">All tasks</h4>
