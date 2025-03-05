@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Loader2, Plus } from "lucide-react"
 import AddTask from "@/components/AddTask";
+import { TaskItem } from "@/components/TaskItem";
 
 
 export default function Home() {
@@ -71,9 +72,7 @@ export default function Home() {
           : (
             <ul>
               {!!tasks && tasks.length > 0 && tasks.map((task) => (
-                <li key={task.id} className="w-full px-2 py-4 rounded-md bg-gray-100 mb-4">
-                  {task.title}
-                </li>
+                <TaskItem key={task.id} task={task} />
               ))}
             </ul>
           )}
