@@ -113,15 +113,15 @@ const Form: React.FC<FormProps> = ({ className, onSubmit, updateTaskPending, tas
           placeholder="Enter task description"
         ></Textarea>
       </div>
-      <div className="grid gap-2 mb-4">
-        <Label htmlFor="completed">Completed</Label>
-        <Input
+      <div className="flex items-center gap-2 mb-4">
+        <input
           type="checkbox"
           id="completed"
           name="completed"
           defaultChecked={task.completed}
           readOnly={updateTaskPending}
         />
+        <Label htmlFor="completed">Completed</Label>
       </div>
       <Button type="submit" disabled={updateTaskPending}>
         {updateTaskPending && <Loader2 className="animate-spin" />}
