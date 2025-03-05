@@ -9,3 +9,10 @@ export interface ITaskData {
   title: string;
   description: string;
 }
+
+export interface IUpdateTaskData {
+  id: number;
+  title: string;
+  description: string;
+  completed: boolean;
+}

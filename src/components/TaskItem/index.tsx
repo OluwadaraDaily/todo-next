@@ -16,8 +16,17 @@ DropdownMenuTrigger,
 import { Task } from "@/types/task";
 import { MoreVertical, Pencil } from "lucide-react";
 
+interface ITaskItem {
+  task: Task;
+}
 
-const CustomDropdownMenu = () => {
+const CustomDropdownMenu = ({ task }: ITaskItem) => {
+  const handleEditTask = () => {
+    console.log("Edit task");
+    console.log("TASK =>", task);
+    const event = new CustomEvent("editTask", { detail: { task } });
+    window.dispatchEvent(event);
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -26,7 +35,7 @@ const CustomDropdownMenu = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-20">
-        <DropdownMenuItem className="flex items-center justify-between gap-4">
+        <DropdownMenuItem onClick={handleEditTask} className="flex items-center justify-between gap-4">
           Edit
           <Pencil size={12} />
         </DropdownMenuItem>
@@ -39,16 +48,14 @@ const CustomDropdownMenu = () => {
   )
 }
 
-interface ITaskItem {
-  task: Task;
-}
-
 export const TaskItem = ({ task }: ITaskItem) => {
   return (
     <li key={task.id} className="w-full p-2 rounded-md bg-gray-100 mb-4 flex items-center justify-between">
       {task.title}
       <span>
-        <CustomDropdownMenu />
+        <CustomDropdownMenu
+          task={task}
+        />
       </span>
     </li>
   )

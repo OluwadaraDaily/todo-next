@@ -1,17 +1,28 @@
 "use client"
-import { Task } from "@/types/task";
+import { IUpdateTaskData, Task } from "@/types/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { TaskService } from "@/services/tasks";
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Loader2, Plus } from "lucide-react"
 import AddTask from "@/components/AddTask";
 import { TaskItem } from "@/components/TaskItem";
+import {EditTaskDialog, EditTaskDialogHandles} from "@/components/EditTaskDialog";
 
 
 export default function Home() {
+  const [currentTask, setCurrentTask] = React.useState<Task>({} as Task);
+  const editDialogRef = useRef<EditTaskDialogHandles>(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    window.addEventListener("editTask", handleEditTask);
+
+    return () => {
+      window.removeEventListener("editTask", handleEditTask)
+    }
+  }, [])
 
   const clearForm = () => {
     const form = document.querySelector('form');
@@ -20,12 +31,13 @@ export default function Home() {
     }
   }
 
+  // Query tasks
   const { data: tasks, isLoading: getTasksInitialLoading, isFetching: getTasksFetching, error, isPending } = useQuery<Task[]>({
     queryKey: ['tasks'],
     queryFn: TaskService.fetchTasks
   });
-
-   const { mutate, isPending: addTaskPending } = useMutation({
+  
+  const { mutate, isPending: addTaskPending } = useMutation({
     mutationFn: TaskService.addTask,
     onSuccess: () => {
       // Invalidate and refetch
@@ -35,8 +47,21 @@ export default function Home() {
     onError: (error) => {
       console.log('ERROR [ADD TASK] =>', error);
     }
-   })
+  })
   
+  const { mutate: updateTask, isPending: updateTaskPending } = useMutation({
+    mutationFn: TaskService.updateTask,
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    },
+    onError: (error) => {
+      console.log('ERROR [UPDATE TASK] =>', error);
+    }
+  })
+
+  
+  // Form event handlers
   const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
     event.preventDefault();
     const form = new FormData(event.target as HTMLFormElement);
@@ -46,7 +71,29 @@ export default function Home() {
     });
     console.log("Form submitted");
   }
+  
+  const handleEditTask = (event: Event) => {
+    const customEvent = event as CustomEvent<{ task: any }>;
+    setCurrentTask(customEvent.detail.task);
+    editDialogRef?.current?.openDialog();
+  }
+  
+  const handleUpdate = (event: React.FormEvent<HTMLElement>, task: Task) => {
+    event.preventDefault();
+    const form = new FormData(event.target as HTMLFormElement);
+    const updatedTask: IUpdateTaskData = {
+      id: task.id,
+      title: form.get('title') as string,
+      description: form.get('description') as string,
+      completed: form.get('completed') === 'on',
+    }
+    console.log("Form submitted", updatedTask);
+    updateTask(updatedTask);
+    editDialogRef?.current?.closeDialog();
+    alert("Task updated successfully");
+  }
 
+  
   return (
     <main className="h-full">
       <section className="w-[90%] md:w-[80%] lg:max-w-[700px] mx-auto h-full my-8">
@@ -72,11 +119,20 @@ export default function Home() {
           : (
             <ul>
               {!!tasks && tasks.length > 0 && tasks.map((task) => (
-                <TaskItem key={task.id} task={task} />
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                />
               ))}
             </ul>
           )}
         </div>
+        <EditTaskDialog
+          ref={editDialogRef}
+          task={currentTask}
+          updateTaskPending={updateTaskPending}
+          onSubmit={handleUpdate}
+        />
       </section>
     </main>
   );
