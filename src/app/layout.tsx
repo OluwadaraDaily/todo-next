@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { QueryProvider } from "@/components/QueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "My Task Manager",
@@ -24,6 +25,12 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          expand={false}
+        />
       </body>
     </html>
   );

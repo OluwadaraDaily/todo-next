@@ -3,12 +3,12 @@ import { IUpdateTaskData, Task } from "@/types/task";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useRef } from "react";
 import { TaskService } from "@/services/tasks";
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Loader2, Plus } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import AddTask from "@/components/AddTask";
 import { TaskItem } from "@/components/TaskItem";
-import {EditTaskDialog, EditTaskDialogHandles} from "@/components/EditTaskDialog";
+import { EditTaskDialog, EditTaskDialogHandles } from "@/components/EditTaskDialog";
+import { toast } from "sonner";
 
 
 export default function Home() {
@@ -54,9 +54,17 @@ export default function Home() {
     onSuccess: () => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success("Success", {
+        description: "Task updated successfully"
+      });
+      console.log("Task updated successfully");
+      editDialogRef?.current?.closeDialog();
     },
     onError: (error) => {
       console.log('ERROR [UPDATE TASK] =>', error);
+      toast.error("Error", {
+        description: "Failed to update task"
+      });
     }
   })
 
@@ -89,8 +97,6 @@ export default function Home() {
     }
     console.log("Form submitted", updatedTask);
     updateTask(updatedTask);
-    editDialogRef?.current?.closeDialog();
-    alert("Task updated successfully");
   }
 
   

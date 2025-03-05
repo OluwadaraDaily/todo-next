@@ -43,8 +43,6 @@ export const EditTaskDialog = forwardRef<EditTaskDialogHandles, EditTaskDialogPr
       try {
         event.preventDefault();
         await onSubmit(event, task);
-        document.querySelector('form')?.reset();
-        setOpen(false);
       } catch (error) {
         console.error('Submission failed:', error);
       }
