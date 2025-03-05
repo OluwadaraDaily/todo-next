@@ -3,9 +3,8 @@ import { NextResponse, NextRequest } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    console.log('GET TASKS');
     const tasks = await prisma.task.findMany();
-    console.log('TASKS =>', tasks);
+
     if (!tasks) {
       return NextResponse.json({
         error: "No tasks found"
@@ -17,7 +16,6 @@ export async function GET(req: Request) {
     }));
     return NextResponse.json(serializedTasks, {  status: 200 });
   } catch (error: any) {
-    console.log('ERROR =>', error)
     return NextResponse.json({
       error: error.message || "Something went wrong"
     }, { status: 500 });
@@ -27,9 +25,9 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const data = await req.json();
-    console.log('BODY [ADD TASKS] =>', data);
+
     const task = await prisma.task.create({ data });
-    console.log('TASK =>', task);
+    
     const serializedTask = {
       ...task,
       id: task.id.toString(), // Convert BigInt to string
@@ -37,7 +35,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(serializedTask, {  status: 201 });
   } catch (error) {
-    console.log('ERROR [ADD TASK] ROUTE =>', error);
     return NextResponse.json({
       error: "Something went wrong"
     }, {  status: 500 });

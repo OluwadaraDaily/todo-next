@@ -22,8 +22,6 @@ interface ITaskItem {
 
 const CustomDropdownMenu = ({ task }: ITaskItem) => {
   const handleEditTask = () => {
-    console.log("Edit task");
-    console.log("TASK =>", task);
     const event = new CustomEvent("editTask", { detail: { task } });
     window.dispatchEvent(event);
   }

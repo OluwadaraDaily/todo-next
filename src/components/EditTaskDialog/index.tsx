@@ -34,12 +34,7 @@ export const EditTaskDialog = forwardRef<EditTaskDialogHandles, EditTaskDialogPr
       closeDialog: () => setOpen(false),
     }));
 
-    useEffect(() => {
-      console.log("OPEN =>", open);
-    }, [open])
-
     const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
-      console.log("HERE!!!!!!!!!!!!")
       try {
         event.preventDefault();
         await onSubmit(event, task);

@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
 import { Button } from "../ui/button"
-import React from "react"
+import React, { forwardRef } from "react"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "../ui/drawer"
 import { cn } from "@/lib/utils"
 import { Label } from "../ui/label"
@@ -10,22 +10,38 @@ import { Input } from "../ui/input"
 import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { Loader2, Plus } from "lucide-react"
 
-interface AddTaskProps {
+export interface AddTaskDialogHandles {
+  openDialog: () => void;
+  closeDialog: () => void;
+  clearForm: () => void;
+}
+
+interface AddTaskDialogProps {
   onSubmit: (event: React.FormEvent<HTMLElement>) => void;
   addTaskPending: boolean;
 }
 
 
-export default function AddTask({ onSubmit, addTaskPending }: AddTaskProps) {
+export const AddTaskDialog = forwardRef<AddTaskDialogHandles, AddTaskDialogProps>(
+  ({ onSubmit, addTaskPending }, ref) => {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
+
+  React.useImperativeHandle(ref, () => ({
+    openDialog: () => setOpen(true),
+    closeDialog: () => setOpen(false),
+    clearForm: () => {
+      const form = document.querySelector('form');
+      if (form) {
+        (form as HTMLFormElement).reset();
+      }
+    }
+  }));
 
   const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
     try {
       event.preventDefault();
       await onSubmit(event);
-      document.querySelector('form')?.reset();
-      setOpen(false);
     } catch (error) {
       console.error('Submission failed:', error);
     }
@@ -75,7 +91,7 @@ export default function AddTask({ onSubmit, addTaskPending }: AddTaskProps) {
       </DrawerContent>
     </Drawer>
   )
-}
+})
 
 interface FormProps extends React.ComponentProps<"form"> {
   addTaskPending: boolean;

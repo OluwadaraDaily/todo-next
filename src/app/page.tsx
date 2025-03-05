@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from "react";
 import { TaskService } from "@/services/tasks";
 import { Skeleton } from "@/components/ui/skeleton"
 import { Loader2 } from "lucide-react"
-import AddTask from "@/components/AddTask";
+import {AddTaskDialog, AddTaskDialogHandles} from "@/components/AddTaskDialog";
 import { TaskItem } from "@/components/TaskItem";
 import { EditTaskDialog, EditTaskDialogHandles } from "@/components/EditTaskDialog";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import { toast } from "sonner";
 export default function Home() {
   const [currentTask, setCurrentTask] = React.useState<Task>({} as Task);
   const editDialogRef = useRef<EditTaskDialogHandles>(null);
+  const addDialogRef = useRef<AddTaskDialogHandles>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -40,30 +41,32 @@ export default function Home() {
   const { mutate, isPending: addTaskPending } = useMutation({
     mutationFn: TaskService.addTask,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
-      clearForm();
+      toast.success("Success", {
+        description: "Task created successfully"
+      });
+      addDialogRef?.current?.closeDialog();
+      addDialogRef?.current?.clearForm();
     },
     onError: (error) => {
-      console.log('ERROR [ADD TASK] =>', error);
+      toast.error("Error", {
+        description: error?.message || "Failed to create task"
+      });
     }
   })
   
   const { mutate: updateTask, isPending: updateTaskPending } = useMutation({
     mutationFn: TaskService.updateTask,
     onSuccess: () => {
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
       toast.success("Success", {
         description: "Task updated successfully"
       });
-      console.log("Task updated successfully");
       editDialogRef?.current?.closeDialog();
     },
     onError: (error) => {
-      console.log('ERROR [UPDATE TASK] =>', error);
       toast.error("Error", {
-        description: "Failed to update task"
+        description: error?.message || "Failed to update task"
       });
     }
   })
@@ -77,7 +80,6 @@ export default function Home() {
       title: form.get('title') as string,
       description: form.get('description') as string,
     });
-    console.log("Form submitted");
   }
   
   const handleEditTask = (event: Event) => {
@@ -95,7 +97,6 @@ export default function Home() {
       description: form.get('description') as string,
       completed: form.get('completed') === 'on',
     }
-    console.log("Form submitted", updatedTask);
     updateTask(updatedTask);
   }
 
@@ -105,7 +106,8 @@ export default function Home() {
       <section className="w-[90%] md:w-[80%] lg:max-w-[700px] mx-auto h-full my-8">
         <div className="flex justify-between items-center">
           <h1>My Task Manager</h1>
-          <AddTask
+          <AddTaskDialog
+            ref={addDialogRef}
             onSubmit={handleSubmit}
             addTaskPending={addTaskPending}
           />
