@@ -25,6 +25,12 @@ const CustomDropdownMenu = ({ task }: ITaskItem) => {
     const event = new CustomEvent("editTask", { detail: { task } });
     window.dispatchEvent(event);
   }
+
+  const handleDeleteTask = () => {
+    const event = new CustomEvent("deleteTask", { detail: { task } });
+    window.dispatchEvent(event)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -37,7 +43,7 @@ const CustomDropdownMenu = ({ task }: ITaskItem) => {
           Edit
           <Pencil size={12} />
         </DropdownMenuItem>
-        <DropdownMenuItem className="flex items-center gap-4 text-red-500 hover:text-red-500">
+        <DropdownMenuItem onClick={handleDeleteTask} className="flex items-center gap-4 text-red-500 hover:text-red-500">
           Delete
           <DropdownMenuShortcut>⌫</DropdownMenuShortcut>
         </DropdownMenuItem>

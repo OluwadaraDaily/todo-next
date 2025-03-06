@@ -9,28 +9,28 @@ import {AddTaskDialog, AddTaskDialogHandles} from "@/components/AddTaskDialog";
 import { TaskItem } from "@/components/TaskItem";
 import { EditTaskDialog, EditTaskDialogHandles } from "@/components/EditTaskDialog";
 import { toast } from "sonner";
+import { DeleteTaskDialog, DeleteTaskDialogHandles } from "@/components/DeleteTaskDialog";
 
 
 export default function Home() {
   const [currentTask, setCurrentTask] = React.useState<Task>({} as Task);
-  const editDialogRef = useRef<EditTaskDialogHandles>(null);
+  const [currentDeleteTask, setCurrentDeleteTask] = React.useState<Task>({} as Task);
+
   const addDialogRef = useRef<AddTaskDialogHandles>(null);
+  const editDialogRef = useRef<EditTaskDialogHandles>(null);
+  const deleteDialogRef = useRef<DeleteTaskDialogHandles>(null);
+
   const queryClient = useQueryClient();
 
   useEffect(() => {
     window.addEventListener("editTask", handleEditTask);
+    window.addEventListener("deleteTask", handleDeleteTask);
 
     return () => {
       window.removeEventListener("editTask", handleEditTask)
+      window.removeEventListener("deleteTask", handleDeleteTask);
     }
   }, [])
-
-  const clearForm = () => {
-    const form = document.querySelector('form');
-    if (form) {
-      (form as HTMLFormElement).reset();
-    }
-  }
 
   // Query tasks
   const { data: tasks, isLoading: getTasksInitialLoading, isFetching: getTasksFetching, error, isPending } = useQuery<Task[]>({
@@ -71,6 +71,22 @@ export default function Home() {
     }
   })
 
+  const { mutate: deleteTask, isPending: deleteTaskPending } = useMutation({
+    mutationFn: TaskService.deleteTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      toast.success("Success", {
+        description: "Task deleted successfully"
+      });
+      deleteDialogRef?.current?.closeDialog();
+    },
+    onError: (error) => {
+      toast.error("Error", {
+        description: error?.message || "Failed to delete task"
+      });
+    }
+  })
+
   
   // Form event handlers
   const handleSubmit = async (event: React.FormEvent<HTMLElement>) => {
@@ -98,6 +114,12 @@ export default function Home() {
       completed: form.get('completed') === 'on',
     }
     updateTask(updatedTask);
+  }
+
+  const handleDeleteTask = (event: Event) => {
+    const customEvent = event as CustomEvent<{ task: Task }>;
+    setCurrentDeleteTask(customEvent.detail.task);
+    deleteDialogRef?.current?.openDialog();
   }
 
   
@@ -140,6 +162,13 @@ export default function Home() {
           task={currentTask}
           updateTaskPending={updateTaskPending}
           onSubmit={handleUpdate}
+        />
+
+        <DeleteTaskDialog
+          ref={deleteDialogRef}
+          task={currentDeleteTask}
+          deleteTaskPending={deleteTaskPending}
+          onSubmit={deleteTask}
         />
       </section>
     </main>

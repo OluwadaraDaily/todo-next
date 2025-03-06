@@ -57,3 +57,29 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  try {
+    // Get task by ID as a parameter
+    const id = parseInt(params.id, 10);
+    
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    // Use ID to fetch task using prisma
+    const task = await prisma.task.findUnique({ where: { id } });
+    
+    if (!task) {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+
+    await prisma.task.delete({ where: { id } });
+    
+    return NextResponse.json({ message: "Task deleted successfully" }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({
+      error: error?.message || "Something went wrong"
+    }, { status: 500 });
+  }
+}

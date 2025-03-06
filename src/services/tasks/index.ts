@@ -49,9 +49,23 @@ const updateTask = async (payload: IUpdateTaskData) => {
     throw error;
   }
 }
+
+const deleteTask = async (taskId: number) => {
+  try {
+    const response = await fetch(`/api/tasks/${taskId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete task");
+    }
+  } catch (error) {
+    throw error;
+  }
+}
   
 export const TaskService = {
   fetchTasks,
   addTask,
-  updateTask
+  updateTask,
+  deleteTask
 }
