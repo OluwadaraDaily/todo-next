@@ -119,10 +119,10 @@ export default function Home() {
           </div>
           {getTasksInitialLoading ?
             <div className="flex flex-col space-y-4">
-              <Skeleton className="h-10 w-full lg:w-[70%]" />
-              <Skeleton className="h-10 w-full lg:w-[70%]" />
-              <Skeleton className="h-10 w-full lg:w-[70%]" />
-              <Skeleton className="h-10 w-full lg:w-[70%]" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
             </div>
           : (
             <ul>
