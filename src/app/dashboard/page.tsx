@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -13,8 +15,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import withAuth from "@/hoc/withAuth"
 
-export default function Page() {
+const DashboardPage = () => {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -50,3 +53,5 @@ export default function Page() {
     </SidebarProvider>
   )
 }
+
+export default withAuth(DashboardPage);
