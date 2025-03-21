@@ -55,7 +55,6 @@ export function LoginForm({
   }
 
   const handleGoogleSignIn = async () => {
-    console.log("Google sign in")
     setGoogleSignInLoading(true);
     try {
       await signUpWithGoogle();
