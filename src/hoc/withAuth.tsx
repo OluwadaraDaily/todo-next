@@ -11,7 +11,6 @@ const withAuth = <P extends object>(WrappedComponent: React.ComponentType<P>) =>
 
     console.log("User =>", user);
 
-
     useEffect(() => {
       if (!loading && !user) {
         router.push("/login");

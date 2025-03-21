@@ -36,7 +36,6 @@ export function RegisterForm({
       const formData = new FormData(e.target as HTMLFormElement)
       const email = formData.get("email") as string
       const password = formData.get("password") as string
-      console.log(`Email: ${email}, Password: ${password}`)
   
       await signUpWithEmail(email, password);
 
